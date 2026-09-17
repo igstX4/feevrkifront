@@ -1,70 +1,98 @@
-# Getting Started with Create React App
+# Feeverki — storefront
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
+![Redux Toolkit](https://img.shields.io/badge/Redux_Toolkit-764ABC?logo=redux&logoColor=white)
+![MUI](https://img.shields.io/badge/MUI-5-007FFF?logo=mui&logoColor=white)
+![Ant Design](https://img.shields.io/badge/Ant_Design-5-0170FE?logo=antdesign&logoColor=white)
 
-## Available Scripts
+Customer-facing build of an online fireworks shop: a catalogue, product pages, a
+basket and a reviews section, built as a single-page React app that talks to a
+REST backend.
 
-In the project directory, you can run:
+> **Relationship to `feeverkiBack`** — both repositories contain the same source
+> tree (165 files); the only difference is a trailing comment in
+> `src/axios/axios.js`. This one is the customer-facing publication of the
+> shared code base, `feeverkiBack` also carries the back-office sections. Treat
+> them as one project published twice and read `feeverkiBack` for the newest
+> revision.
 
-### `npm start`
+## Pages
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+| Route | Page |
+|-------|------|
+| `/` | Home — hero slider, featured products, categories, delivery highlights |
+| `/catalog/:type` | Catalogue by product type |
+| `/category/:name` | Catalogue by category |
+| `/product/:productName` | Product card with a photo gallery lightbox |
+| `/basket` | Shopping basket |
+| `/stock` | Current discounts |
+| `/reviews` | Customer reviews and the review form |
+| `/paymentInfo` | Delivery and payment terms |
+| `/security` | Fireworks safety rules |
+| `/contacts` | Contacts and social links |
+| `/admin/*` | Back office (see `feeverkiBack` for the documented version) |
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## How it is put together
 
-### `npm test`
+```
+src/
+├── axios/            one axios instance shared by every request
+├── components/       Header, Footer, Catalog, HomeProducts, Reviews,
+│                     SlidersHome, Discounts, BurgerModal …
+│   └── admin/        back-office sections and their modals
+├── fonts/            TT Norms webfont
+├── hooks/            useDebounce (search inputs)
+├── Layouts/          storefront shell
+├── pages/            one folder per route, SCSS module next to the view
+├── store/
+│   ├── store.js      configureStore
+│   ├── basket/       basket slice — persists the cart across pages
+│   └── user/         session slice (`fetchMe`)
+└── utils/            banner and slider seed data
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Each page owns its own SCSS module, so styling stays next to the markup and a
+route can be lifted out without touching global styles. Redux Toolkit holds only
+the state that outlives a page: the basket and the signed-in user.
 
-### `npm run build`
+A `useDebounce` hook drives the catalogue search, which keeps typing cheap on
+slow catalogues.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Tech stack
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+React 18 (Create React App) · Redux Toolkit · React Router 6 · axios ·
+React Hook Form · MUI 5 + Ant Design 5 (`ru_RU` locale) + Emotion ·
+react-alice-carousel · react-photo-view · FontAwesome · SCSS / Sass.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Ant Design handles the dense forms and tables, MUI covers the marketing
+sections — the split keeps the design language of the shop and the tooling of the
+admin area independent.
 
-### `npm run eject`
+## Running it
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```bash
+npm install
+npm start        # http://localhost:3000
+npm run build    # static bundle in ./build
+npm test         # CRA test runner
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+The API endpoint is a constant at the top of `src/axios/axios.js`:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```js
+const url = 'https://kumisback11.vercel.app/internal';
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+const instance = axios.create({
+  baseURL: url,
+  headers: { Authorization: window.localStorage.getItem('token') },
+});
+```
 
-## Learn More
+## Notes
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Because the production build is a plain static bundle, hosting it behind a
+  catch-all rewrite (all paths → `index.html`) is required for deep links such as
+  `/product/:productName` to survive a refresh.
+- The authorization header is captured when the module loads; an interceptor
+  would be the cleaner place for it.
+- The UI copy is Russian and lives inline in the components.
